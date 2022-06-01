@@ -1,0 +1,12 @@
+excitatory_synapse = Synapse(0.05, 0.01, 1e-9);
+tstart = 0.0;
+tend = 1.0;
+fs = 1e4;
+N = tstart: (1/fs): tend-(1/fs);
+t = tstart;
+
+for n = 1: 1: size(N, 2)
+    excitatory_synapse.call(t);
+    fprintf('%f, %f \', t, excitatory_synapse.state);
+    t = t + (1/fs);
+end
