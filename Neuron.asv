@@ -9,11 +9,10 @@ classdef Neuron
         Ee
         Ei
         Eth
-        Emax
     end
 
     methods
-        function obj = Neuron(Cm, Rin, Er, Ee, Ei, Eth, Emax)
+        function obj = Neuron(Cm, Rin, Er, Ee, Ei, Eth)
             %UNTITLED2 Construct an instance of this class
             %   Detailed explanation goes here
             obj.Cm = Cm;
@@ -22,7 +21,6 @@ classdef Neuron
             obj.Ee = Ee;
             obj.Ei = Ei;
             obj.Eth = Eth;
-            obj.Emax = Emax;
         end
 
         function response = call(obj, Iinj, ge, gi, fs)
@@ -30,11 +28,8 @@ classdef Neuron
             %   Detailed explanation goes here
             response = zeros(size(ge))+obj.Er;
             for i = 2: 1: size(ge, 2)
-                response(:, i) = response(:, i-1) + (1/fs)*(1/obj.Cm)*(Iinj - (1/obj.Rin)*(response(:, i-1) - obj.Er) - ge(:, i)*(response(:, i-1)-obj.Ee) - gi(:, i)*(response(:, i-1) - obj.Ei));
+                response(:, i) = response(:, i-1) + (1/fs)*(1/obj.Cm)*(Iinj - (1/obj.Rin)*(response(:, i-1) - ))
             end
-            spikeIndicies = response > obj.Eth;
-            disp(spikeIndicies);
-            response(spikeIndicies) = obj.Emax;
         end
     end
 end

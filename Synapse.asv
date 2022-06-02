@@ -30,10 +30,10 @@ classdef Synapse
                 for t = 1: 1: size(trig_times, 2)
                     disp(trig_times(t));
                     exponent = (times > trig_times(t)).*(times - trig_times(t))./obj.tau;
-                    response = cat(1, response, exponent.*exp(-1.*exponent + 1));
+                    response = cat(1, response, obj.amp.*exponent.*exp(-1.*exponent + 1));
                 end
-                disp(size(response));
-                response = obj.amp.*max(response, [], 1);
+                disp(size)
+                response = max(response, [], 1);
             end
             response = temporalShift(response, delay, fs);
         end
