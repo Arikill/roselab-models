@@ -1,54 +1,66 @@
 s = Stimulus(1e4, 2200, 'triangular', 20e-3, 2e-3);
-[stim, times, trigs] = s.generateStimulus(1.0, 5, 5);
+[stim, times, trigs] = s.generateStimulus(1.0, 60, 5);
+
+afferent = {};
+afferent.neuron = Neuron(14e-12, 0.5e9, -65e-3, -30e-3, -100e-3, -55e-3, -20e-3, 0.02);
+afferent.excitatorySynapse = Synapse(1e-9, 0.01);
+afferent.excitation = afferent.excitatorySynapse.call(trigs, s.fs, 'maxima', 0.01);
+afferent.inhibitorySynapse = Synapse(0e-9, 0.01);
+afferent.inhibition = afferent.inhibitorySynapse.call(trigs, s.fs, 'maxima', 0.01);
+[afferent.response, afferent.spkTrigs] = afferent.neuron.call(0e-9, afferent.excitation, afferent.inhibition, s.fs);
 
 relayNeuron = {};
-relayNeuron.neuron = Neuron(14e-11, 0.5e9, -65e-3, -30e-3, -100e-3, -61e-3, -20e-3, 0.02);
+relayNeuron.neuron = Neuron(14e-12, 0.5e9, -65e-3, -30e-3, -100e-3, -55e-3, -20e-3, 0.02);
 relayNeuron.excitatorySynapse = Synapse(1e-9, 0.01);
-relayNeuron.excitation = relayNeuron.excitatorySynapse.call(trigs, s.fs, 'maxima', 0.01);
+relayNeuron.excitation = relayNeuron.excitatorySynapse.call(afferent.spkTrigs, s.fs, 'maxima', 0.01);
 relayNeuron.inhibitorySynapse = Synapse(0e-9, 0.01);
-relayNeuron.inhibition = relayNeuron.inhibitorySynapse.call(trigs, s.fs, 'maxima', 0.01);
+relayNeuron.inhibition = relayNeuron.inhibitorySynapse.call(afferent.spkTrigs, s.fs, 'maxima', 0.01);
 [relayNeuron.response, relayNeuron.spkTrigs] = relayNeuron.neuron.call(0e-9, relayNeuron.excitation, relayNeuron.inhibition, s.fs);
 
 lin = {};
-lin.neuron = Neuron(14e-11, 0.5e9, -65e-3, -30e-3, -100e-3, -63.5e-3, -20e-3, 0.03);
-lin.excitatorySynapse = Synapse(1e-9, 0.005);
-lin.excitation = lin.excitatorySynapse.call(trigs, s.fs, 'depression', 0.025);
+lin.neuron = Neuron(14e-12, 0.5e9, -65e-3, -30e-3, -100e-3, -55e-3, -20e-3, 0.03);
+lin.excitatorySynapse = Synapse(1e-9, 0.04);
+lin.excitation = lin.excitatorySynapse.call(trigs, s.fs, 'maxima', 0.025);
 lin.inhibitorySynapse = Synapse(1e-9, 0.01);
 lin.inhibition = lin.inhibitorySynapse.call(relayNeuron.spkTrigs, s.fs, 'depression', 0.01);
 [lin.response, lin.spkTrigs] = lin.neuron.call(0e-9, lin.excitation, lin.inhibition, s.fs);
 
+icn = {};
+icn.neuron = Neuron(14e-12, 0.5e9, -65e-3, -30e-3, -100e-3, -55e-3, -20e-3, 0.03);
+icn.excitatorySynapse = Synapse(1e-9, 0.01);
+icn.excitation = icn.excitatorySynapse.call(trigs, s.fs, 'summation', 0.025);
+icn.inhibitorySynapse = Synapse(1e-9, 0.01);
+icn.inhibition = icn.inhibitorySynapse.call(lin.spkTrigs, s.fs, 'depression', 0.01);
+[icn.response, icn.spkTrigs] = icn.neuron.call(0e-9, icn.excitation, icn.inhibition, s.fs);
+
 figure();
-tiledlayout(5, 1);
-nexttile;
+tiledlayout(9, 1);
+ax(1) = nexttile;
+plot(times, icn.response, 'k');
+ylabel('ICN response');
+ax(2) = nexttile;
+plot(times, icn.excitation, 'r', times, icn.inhibition, 'b');
+ylabel('ICN conductances');
+ax(3) = nexttile;
 plot(times, lin.response, 'k');
 ylabel('LIN response');
-nexttile;
+ax(4) = nexttile;
 plot(times, lin.excitation, 'r', times, lin.inhibition, 'b');
 ylabel('LIN conductances');
-nexttile;
+ax(5) = nexttile;
 plot(times, relayNeuron.response, 'k');
 ylabel('Relay neuron response');
-nexttile;
+ax(6) = nexttile;
 plot(times, relayNeuron.excitation, 'r', times, relayNeuron.inhibition, 'b');
 ylabel('Relay neuron conductances');
-nexttile;
+ax(7) = nexttile;
+plot(times, afferent.response, 'k');
+ylabel('Afferent neuron response');
+ax(8) = nexttile;
+plot(times, afferent.excitation, 'r', times, afferent.inhibition, 'b');
+ylabel('Afferent conductances');
+ax(9) = nexttile;
 plot(times, stim, 'k');
 ylabel('stimulus');
-xlabel('time(sec)')
-
-% excitatory_synapse = Synapse(1e-9, 0.01);
-% excitation = excitatory_synapse.call(trigs, s.fs, 'summation', 0.03);
-% inhibitory_synapse = Synapse(0.5e-9, 0.02);
-% inhibition = inhibitory_synapse.call(trigs, s.fs, 'maxima', 0.01);
-% neuron = Neuron(14e-11, 0.5e9, -65e-3, -30e-3, -100e-3, -59e-3, 10e-3);
-% [response, spkTrigs] = neuron.call(0e-9, excitation, inhibition, 1e4);
-% figure();
-% tiledlayout(4, 1)
-% nexttile;
-% plot(times, response, 'k');
-% nexttile;
-% plot(times, spkTrigs, 'k');
-% nexttile;
-% plot(times, excitation, 'r', times, inhibition, 'b');
-% nexttile;
-% plot(times, stim);
+xlabel('time(sec)');
+linkaxes(ax, 'x');

@@ -41,9 +41,9 @@ classdef Neuron
             while index
                 response(:, index) = obj.Emax;
                 count = count + 1;
-                if count > 20
-                    break;
-                end
+%                 if count > 20
+%                     break;
+%                 end
                 eSamples = index+spkSamples;
                 if eSamples < size(response, 2)
                     spikeIndicies(:, index:index+spkSamples) = 0;
