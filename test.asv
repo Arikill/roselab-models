@@ -1,8 +1,0 @@
-s = Stimulus(1e4, 2200, 'triangular', 20e-3, 2e-3);
-[stim, times, trigs] = s.generateStimulus(1.0, 40, 5);
-excitatory_synapse = Synapse(1e-9, 0.03);
-inhibitory_synapse = Synapse(-1e-9, 0.04);
-excitation = excitatory_synapse.call(trigs, s.fs, 'summation', 0.01);
-inhibition = inhibitory_synapse.call(trigs, s.fs, 'maxima', 0.05);
-neuron = Neuron(14e-12, 0.5e9, -65e)
-plot(times, excitation, 'r', times, inhibition, 'b');
