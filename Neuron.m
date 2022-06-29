@@ -30,6 +30,8 @@ classdef Neuron
     %   Vm[t] = Vm[t - dt] + dt*(1/Cm)*(Iinj[t-dt] - ge[t-dt]*(Vm[t-dt] -
     %   Ee) - gi[t - dt]*(Vm[t - dt] - Ei) - (1/Rin)*(Vm[t-dt] - Er))
     %   This makes Vm causal i.e., dependent on previous (temporal) values of Vm and inputs.
+    %   The above formulation sets up the system for explicit Euler
+    %   updates.
 
     properties
         Cm
@@ -60,28 +62,35 @@ classdef Neuron
 
         function [response, trigs] = call(obj, Iinj, ge, gi, fs)
             %call computes the output of the neuron.
-            %   
-            response = zeros(size(ge))+obj.Er;
-            for i = 2: 1: size(ge, 2)
-                response(:, i) = response(:, i-1) + (1/fs)*(1/obj.Cm)*(Iinj - (1/obj.Rin)*(response(:, i-1) - obj.Er) - ge(:, i)*(response(:, i-1)-obj.Ee) - gi(:, i)*(response(:, i-1) - obj.Ei));
+            %   Iinj is injected current via an electrode during the
+            %   whole-cell recording to depolarize or hyperpolarize the
+            %   neuron.
+            %   ge is the output (changes in conductance) of the excitatory synapse.
+            %   gi is the output (changes in conductance) of the inhibitory synapse.
+            %   fs is the sampling rate for simulation and is the same rate
+            %   used for computing the outputs of both excitatory and
+            %   inhibitory neurons.
+            response = zeros(size(ge))+obj.Er; % Response or Vm, have the same samples as ge and gi.
+            for i = 2: 1: size(ge, 2) % Iteration through time to compute Vm at each time point.
+                response(:, i) = response(:, i-1) + (1/fs)*(1/obj.Cm)*(Iinj - (1/obj.Rin)*(response(:, i-1) - obj.Er) - ge(:, i)*(response(:, i-1)-obj.Ee) - gi(:, i)*(response(:, i-1) - obj.Ei)); % Explicit Euler update
             end
-            spikeIndicies = response > obj.Eth;
-            spkSamples = floor(obj.Tr*fs);
-            index = find(spikeIndicies, 1, 'first');
-            count = 1;
+            spikeIndicies = response > obj.Eth; % Vectorized computation of where Vm crosses the spike threshold, Eth.
+            refracSamples = floor(obj.Tr*fs); % Number of samples (refractory samples) before another spike can occur.
+            index = find(spikeIndicies, 1, 'first'); % Find the first spike.
+%             count = 1;
             while index
-                response(:, index) = obj.Emax;
-                count = count + 1;
+                response(:, index) = obj.Emax; % Generate spikes.
+%                 count = count + 1;
 %                 if count > 20
 %                     break;
 %                 end
-                eSamples = index+spkSamples;
+                eSamples = index+refracSamples; % From spike until refractory period is finished, zero all spike indicies.
                 if eSamples < size(response, 2)
-                    spikeIndicies(:, index:index+spkSamples) = 0;
+                    spikeIndicies(:, index:index+refracSamples) = 0;
                 end
-                index = find(spikeIndicies, 1, 'first');
+                index = find(spikeIndicies, 1, 'first'); % When refractory period is done, compute where the next spike occurs.
             end
-            trigs = (response >= obj.Emax);
+            trigs = (response >= obj.Emax); % Set triggers when the response is set to Emax, these will serve as spike triggers that serve as input to the next neuron or layer.
         end
     end
 end

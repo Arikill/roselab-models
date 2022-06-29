@@ -1,5 +1,5 @@
 classdef Stimulus
-    %UNTITLED2 Summary of this class goes here
+    %Stimulus Summary of this class goes here
     %   Detailed explanation goes here
 
     properties
