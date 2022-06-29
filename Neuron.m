@@ -1,6 +1,35 @@
 classdef Neuron
-    %UNTITLED2 Summary of this class goes here
-    %   Detailed explanation goes here
+    %Neuron -> Mathematically formulated as an RC circuit.
+    %   A single compartmental model (SCM) represents the neuron as a single
+    %   compartment or RC circuit with the excitatory and inhibitory
+    %   conductances as synaptic inputs.
+    %   Mathematically it is represented as follows:
+    %   Cm*(dVm/dt) = Iinj - ge*(Vm - Ee) - gi*(Vm - Ei) - (1/Rin)*(Vm - Er)
+    %   Cm : Membrane capacitance (F)
+    %   Vm : Trans-membrane potential (V)
+    %   t : time (sec)
+    %   ge : Excitatory synpatic conductance (Response from an excitatory
+    %   Synapse, see Synapse.m) (S)
+    %   Ee : Excitatory reversal potential (V). The potential at which the
+    %   excitatory current from the excitatory synapse is reversed.
+    %   gi : Inhibitory synaptic conductance (Response from an inhibitory
+    %   Synapse, see Synapse.m) (S)
+    %   Ei : Inhibitory reversal potential (V). The potential at which the
+    %   inhibitory current from the inhibitory synapse is reversed.
+    %   Rin : Input resistance of the neuron. (1/Rin) = gleak is the
+    %   leakage conductance (constant, S)
+    %   
+    %   The mathematical representation can be further expanded using
+    %   truncated Taylor series expansion in temporal domain:
+    %   dVm/dt = (Vm[t] - Vm[t-dt])/(t - t-dt))
+    %   here dt = (1/fs) where fs is the sampling rate of the simulation or
+    %   data acquisition system (in CED 1401 fs is 10kHz <=> dt is 0.0001).
+    %   
+    %   Expanding the single compartmental model will lead to the
+    %   difference equation:
+    %   Vm[t] = Vm[t - dt] + dt*(1/Cm)*(Iinj[t-dt] - ge[t-dt]*(Vm[t-dt] -
+    %   Ee) - gi[t - dt]*(Vm[t - dt] - Ei) - (1/Rin)*(Vm[t-dt] - Er))
+    %   This makes Vm causal i.e., dependent on previous (temporal) values of Vm and inputs.
 
     properties
         Cm
@@ -8,15 +37,17 @@ classdef Neuron
         Er
         Ee
         Ei
-        Eth
-        Emax
-        Tr
+        Eth % Neuronal Threshold.
+        Emax % Maximum value of Vm or the max height of generate spikes.
+        Tr % Refractory period, the minimum time between spikes.
     end
 
     methods
         function obj = Neuron(Cm, Rin, Er, Ee, Ei, Eth, Emax, Tr)
-            %UNTITLED2 Construct an instance of this class
-            %   Detailed explanation goes here
+            %Neuron Constructor accepts neural properties listed in
+            %   classdef.
+            %   Tr is the refractory time (sec) and controls the number of
+            %   spikes that could occur if Vm exceeds Eth
             obj.Cm = Cm;
             obj.Rin = Rin;
             obj.Er = Er;
@@ -28,8 +59,8 @@ classdef Neuron
         end
 
         function [response, trigs] = call(obj, Iinj, ge, gi, fs)
-            %METHOD1 Summary of this method goes here
-            %   Detailed explanation goes here
+            %call computes the output of the neuron.
+            %   
             response = zeros(size(ge))+obj.Er;
             for i = 2: 1: size(ge, 2)
                 response(:, i) = response(:, i-1) + (1/fs)*(1/obj.Cm)*(Iinj - (1/obj.Rin)*(response(:, i-1) - obj.Er) - ge(:, i)*(response(:, i-1)-obj.Ee) - gi(:, i)*(response(:, i-1) - obj.Ei));
