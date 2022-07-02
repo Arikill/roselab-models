@@ -3,7 +3,7 @@ classdef Stimulus
     %   Detailed explanation goes here
 
     properties
-        fs
+        fs % Sampling frequency
         carrierFreq
         pulseRate
         npulses
