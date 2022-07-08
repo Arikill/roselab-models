@@ -72,7 +72,7 @@ classdef Neuron
             %   inhibitory neurons.
             response = zeros(size(ge))+obj.Er; % Response or Vm, have the same samples as ge and gi.
             for i = 2: 1: size(ge, 2) % Iteration through time to compute Vm at each time point.
-                response(:, i) = response(:, i-1) + (1/fs)*(1/obj.Cm)*(Iinj - (1/obj.Rin)*(response(:, i-1) - obj.Er) - ge(:, i)*(response(:, i-1)-obj.Ee) - gi(:, i)*(response(:, i-1) - obj.Ei)); % Explicit Euler update
+                response(:, i) = response(:, i-1) + (1/fs)*(1/obj.Cm)*(Iinj - (1/obj.Rin)*(response(:, i-1) - obj.Er) - ge(:, i-1)*(response(:, i-1)-obj.Ee) - gi(:, i-1)*(response(:, i-1) - obj.Ei)); % Explicit Euler update
             end
             spikeIndicies = response > obj.Eth; % Vectorized computation of where Vm crosses the spike threshold, Eth.
             refracSamples = floor(obj.Tr*fs); % Number of samples (refractory samples) before another spike can occur.

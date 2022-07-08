@@ -1,5 +1,5 @@
 s = Stimulus(1e4, 2200, 'triangular', 20e-3, 2e-3);
-[stim, times, trigs] = s.generateStimulus(1.0, 60, 5);
+[stim, times, trigs] = s.generateStimulus(1.0, 40, 5);
 
 disp("Afferent");
 afferent = {};

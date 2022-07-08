@@ -44,6 +44,10 @@ classdef Synapse
             %   delay is the response initiation delay of the synapse after
             %   the input spikes arrive.
             input_spike_times = find(input_spikes)/fs; % Array to hold the samples at which input spikes have occured; division by fs converts samples to times.
+            if isempty(input_spike_times) % If there are no input_spikes (all elements are zero) i.e., no synaptic events at this synapse, then return zeros as response.
+                response = input_spikes; % When input_spikes have all elements are zero, it is convinient to return input_spikes as a response rather than manually create a new array.
+                return;
+            end
             samples = size(input_spikes, 2); % Total number of time samples needed. The input_spikes are of the shape [1, samples]
             times = linspace(0, samples/fs, samples); % An array of size [1, samples] of times starting from 0 to samples/fs i.e. end time.
             response = zeros(size(input_spike_times, 2), size(input_spikes, 2)); % An array (size of input_spikes or dim 2 or columns) to contain responses from each input_spike_time (dim 1 or rows).
