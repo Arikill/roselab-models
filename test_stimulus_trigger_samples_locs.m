@@ -1,5 +1,7 @@
-s = Stimulus(1e3, 2200, 'triangular', 20e-3, 2e-3);
-[stim, times, trigs] = s.generateStimulus(1.0, 50, 5);
+s = Stimulus(1e4, 2200, 'triangular', 20e-3, 2e-3);
+% [stim, times, trigs] = s.generateStimulus(1.0, 50, 5);
+input_trigs = [0 61 127 200 280 365 455 548 641 732 818 895 902];
+[stim, times, trigs] = s.generateStimulusAtSamples(input_trigs, 1e3);
 
 disp("Afferent");
 afferent = {};

@@ -36,7 +36,43 @@ classdef Stimulus
                 offPulse = zeros(size(onPulse, 1), floor(offTime*obj.fs));
                 modulator = cat(2, onPulse, offPulse);
             end
+            if size(carrier, 2) > size(modulator, 2)
+                modulator = cat(2, modulator, zeros(size(modulator, 1), size(carrier, 2)-size(modulator, 2)));
+            elseif size(carrier, 2) < size(modulator, 2)
+                modulator = modulator(:, 1:size(carrier, 2));
+            end
             pulse = carrier.*modulator;
+        end
+        
+        function [stim, times, trigs] = generateStimulusAtSamples(obj, pulse_trig_samples, fs_in)
+            obj.npulses = size(pulse_trig_samples, 2); % Compute the number of pulses from the input trigger samples.
+            pulse_trig_times = pulse_trig_samples./fs_in; % Compute the trigger times from the sampling rate.
+            pulseDurations = diff(pulse_trig_times);
+            maxDuration = max(pulseDurations, [], 2);
+            for i = 1: 1: size(pulseDurations, 2)
+                if obj.pulseOnTime > pulseDurations(1, i)
+                    obj.pulseOnTime = pulseDurations(1, i);
+                end
+            end
+            stim_array = cell(obj.npulses, 1);
+            trigs_array = cell(obj.npulses, 1);
+            for i = 1: 1: obj.npulses-1
+               stim_array{i, 1} = obj.generatePulse(pulseDurations(1, i), obj.pulseOnTime, obj.riseTime);
+               trigs_array{i, 1} = stim_array{i, 1}.*0;
+               trigs_array{i, 1}(1, 1) = 1;
+            end
+            stim_array{obj.npulses, 1} = obj.generatePulse(pulseDurations(1, i-1), obj.pulseOnTime, obj.riseTime);
+            trigs_array{obj.npulses, 1} = stim_array{obj.npulses, 1}.*0;
+            trigs_array{obj.npulses, 1}(1, 1) = 1;
+            stim = [];
+            trigs = [];
+            for i = 1: 1: obj.npulses
+               stim = cat(2, stim, stim_array{i, 1});
+               trigs = cat(2, trigs, trigs_array{i, 1});
+            end
+            stim = cat(2, stim, zeros(size(stim, 1), floor(maxDuration*obj.fs)));
+            trigs = cat(2, trigs, zeros(size(trigs, 1), floor(maxDuration*obj.fs)));
+            times = (0: size(stim, 2)-1)/obj.fs;
         end
 
         function [stim, times, trigs] = generateStimulus(obj, stimDuration, pulseRate, npulses)

@@ -77,13 +77,8 @@ classdef Neuron
             spikeIndicies = response > obj.Eth; % Vectorized computation of where Vm crosses the spike threshold, Eth.
             refracSamples = floor(obj.Tr*fs); % Number of samples (refractory samples) before another spike can occur.
             index = find(spikeIndicies, 1, 'first'); % Find the first spike.
-%             count = 1;
             while index
                 response(:, index) = obj.Emax; % Generate spikes.
-%                 count = count + 1;
-%                 if count > 20
-%                     break;
-%                 end
                 eSamples = index+refracSamples; % From spike until refractory period is finished, zero all spike indicies.
                 if eSamples < size(response, 2)
                     spikeIndicies(:, index:index+refracSamples) = 0;
