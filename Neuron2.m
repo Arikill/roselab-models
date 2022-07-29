@@ -8,23 +8,40 @@ classdef Neuron2
        Eth
        Emax
        Tr
-       synapses
+       Vm
+       triggers
    end
    
    methods
        function obj = Neuron2(props)
-           obj.Cm = props.Cm;
-           obj.Rin = props.Rin;
-           obj.Er = props.Er;
-           obj.Eth = props.Eth;
-           obj.Emax = props.Emax;
-           obj.Tr = props.Tr;
-           for i = 1: 1: length(props.synapses)
-              obj.synapses{i} = Synapse(props.synapses{i}.amp, props.synapses{i}.tau); 
+           if nargin ~= 0
+              [m, n] = size(props.Cm);
+              obj(m, n) = obj;
+              for i = 1: m
+                  for j = 1: n
+                      obj(i, j).Cm = props.Cm(i, j);
+                      obj(i, j).Rin = props.Rin(i, j);
+                      obj(i, j).Er = props.Er(i, j);
+                      obj(i, j).Eth = props.Eth(i, j);
+                      obj(i, j).Emax = props.Emax(i, j);
+                      obj(i, j).Tr = props.Tr(i, j);
+                  end
+              end
            end
        end
        
-       function [response, trigs] = call(obj, Iinj, fs)
+       function obj = call(obj, Iinj, syns, fs)
+           [m, n] = size(obj);
+           [ms, ~] = size(syns);
+           nsyns_per_cell = floor(ms/m);
+           for i = 1: m
+               for j = 1: n
+                   timesteps = size(syns(i+1, j+1).response, 2);
+                   for t = 2: 1: timesteps
+                       
+                   end
+               end
+           end
        end
        
    end
