@@ -9,7 +9,9 @@ classdef Stimulus
         npulses
         pulseOnTime
         riseTime
-        envelope
+        pulseEnvelope
+        gap
+        gapPulse
     end
 
     methods
@@ -18,7 +20,7 @@ classdef Stimulus
             %   Detailed explanation goes here
             obj.fs = fs;
             obj.carrierFreq = carrierFreq;
-            obj.envelope = envelope;
+            obj.pulseEnvelope = envelope;
             obj.pulseOnTime = pulseOnTime;
             obj.riseTime = riseTime;
         end
@@ -27,7 +29,7 @@ classdef Stimulus
             times = 0: (1/obj.fs): pulseDuration-(1/obj.fs);
             carrier = sin(2*pi*obj.carrierFreq.*times);
             offTime = pulseDuration - onTime;
-            if strcmp(obj.envelope, 'triangular')
+            if strcmp(obj.pulseEnvelope, 'triangular')
                 rise_times = 0: (1/obj.fs): riseTime-(1/obj.fs);
                 rise_pulse = rise_times.*(1/riseTime);
                 fall_times = riseTime: (1/obj.fs): onTime-(1/obj.fs);
