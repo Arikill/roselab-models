@@ -10,12 +10,12 @@ classdef Stimulus
         pulseOnTime
         riseTime
         pulseEnvelope
-        gap
+        gapSamples
         gapPulse
     end
 
     methods
-        function obj = Stimulus(fs, carrierFreq, envelope, pulseOnTime, riseTime)
+        function obj = Stimulus(fs, carrierFreq, envelope, pulseOnTime, riseTime, gap, gapPulse)
             %UNTITLED2 Construct an instance of this class
             %   Detailed explanation goes here
             obj.fs = fs;
@@ -23,6 +23,14 @@ classdef Stimulus
             obj.pulseEnvelope = envelope;
             obj.pulseOnTime = pulseOnTime;
             obj.riseTime = riseTime;
+            disp(nargin);
+            if nargin < 6
+                obj.gapSamples = 0;
+                obj.gapPulse = 0;
+            else
+                obj.gapSamples = floor(obj.fs*gap);
+                obj.gapPulse = gapPulse;
+            end
         end
 
         function pulse = generatePulse(obj, pulseDuration, onTime, riseTime)
@@ -79,6 +87,10 @@ classdef Stimulus
             for i = 1: 1: obj.npulses
                stim = cat(2, stim, stim_array{i, 1});
                trigs = cat(2, trigs, trigs_array{i, 1});
+               if i == obj.gapPulse
+                   stim = cat(2, stim, zeros(1, obj.gapSamples));
+                   trigs = cat(2, trigs, zeros(1, obj.gapSamples));
+               end
             end
             % Append maxDuration(pulse) worth zeros at the end to visualize
             % the response to the final pulse.
@@ -86,6 +98,13 @@ classdef Stimulus
             trigs = cat(2, trigs, zeros(size(trigs, 1), floor(maxDuration*obj.fs)));
             % Generate a time array depending on the stimulus.
             times = (0: size(stim, 2)-1)/obj.fs;
+        end
+
+        function Y = injectBetween(~, X, samples, injectionStart)
+            Y1 = X(:, 1:injectionStart);
+            Y2 = X(:, injectionStart:end);
+            Y = cat(2, Y1, zeros(size(X, 1), samples));
+            Y = cat(2, Y, Y2);
         end
 
         function [stim, times, trigs] = generateStimulus(obj, stimDuration, pulseRate, npulses)
@@ -102,8 +121,16 @@ classdef Stimulus
             pulses = pulses*pulse;
             pulse_trigs = zeros(size(pulses));
             pulse_trigs(:, 1) = 1.0;
+            pulseSamples = size(pulses, 2);
+            if obj.gapPulse > 0
+                injectStartSample = pulseSamples*obj.gapPulse;
+            end
             stim = reshape(pulses', [], 1)';
             trigs = reshape(pulse_trigs', [], 1)';
+            if obj.gapPulse > 0
+                stim = obj.injectBetween(stim, obj.gapSamples, injectStartSample);
+                trigs = obj.injectBetween(trigs, obj.gapSamples, injectStartSample);
+            end
             stimOnTime = (size(stim, 2)/obj.fs);
             stimOffTime = stimDuration - stimOnTime;
             if stimOffTime > 0
