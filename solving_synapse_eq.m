@@ -1,8 +1,9 @@
 clear; clc;
-syms time td tau gmax;
-exps = (time-td)/tau;
-alpha = gmax*exps*exp(-1*((time-td)/tau) + 1);
-dalpha_by_dt = diff(alpha, time);
+syms times td tau gain;
+exps = (times-td)/tau;
+alpha = gain*exps*exp(-1*((times-td)/tau) + 1);
+dalpha_by_dt = diff(alpha, times);
 disp(dalpha_by_dt);
-d2alpha_by_dt2 = diff(dalpha_by_dt, time);
+disp(dalpha_by_dt);
+d2alpha_by_dt2 = diff(dalpha_by_dt, times);
 disp(d2alpha_by_dt2);

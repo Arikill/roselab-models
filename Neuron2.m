@@ -3,13 +3,12 @@ classdef Neuron2
        Cm
        Rin
        Er
-       Ee
-       Ei
        Eth
        Emax
        Tr
        Vm
-       triggers
+       syne
+       syni
    end
    
    methods
