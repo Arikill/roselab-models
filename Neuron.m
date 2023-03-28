@@ -38,18 +38,27 @@ classdef Neuron
         Rin
         Er
         Ee
+        Enmda % Reversal potential for NMDA receptors.
         Ei
         Eth % Neuronal Threshold.
+        Eth_nmda % Threshold of NMDA activation.
         Emax % Maximum value of Vm or the max height of generate spikes.
         Tr % Refractory period, the minimum time between spikes.
     end
 
     methods
-        function obj = Neuron(Cm, Rin, Er, Ee, Ei, Eth, Emax, Tr)
+        function obj = Neuron(Cm, Rin, Er, Ee, Ei, Eth, Emax, Tr, Enmda, Eth_nmda)
             %Neuron Constructor accepts neural properties listed in
             %   classdef.
             %   Tr is the refractory time (sec) and controls the number of
             %   spikes that could occur if Vm exceeds Eth
+            if nargin > 8
+                obj.Enmda = Enmda;
+                obj.Eth_nmda = Eth_nmda;
+            else
+                obj.Enmda = [];
+                obj.Eth_nmda = [];
+            end
             obj.Cm = Cm;
             obj.Rin = Rin;
             obj.Er = Er;
@@ -60,7 +69,7 @@ classdef Neuron
             obj.Tr = Tr;
         end
 
-        function [response, trigs] = call(obj, Iinj, ge, gi, fs)
+        function [response, trigs] = call(obj, Iinj, ge, gi, fs, gnmda)
             %call computes the output of the neuron.
             %   Iinj is injected current via an electrode during the
             %   whole-cell recording to depolarize or hyperpolarize the
@@ -72,7 +81,11 @@ classdef Neuron
             %   inhibitory neurons.
             response = zeros(size(ge))+obj.Er; % Response or Vm, have the same samples as ge and gi.
             for i = 2: 1: size(ge, 2) % Iteration through time to compute Vm at each time point.
-                response(:, i) = response(:, i-1) + (1/fs)*(1/obj.Cm)*(Iinj - (1/obj.Rin)*(response(:, i-1) - obj.Er) - ge(:, i-1)*(response(:, i-1)-obj.Ee) - gi(:, i-1)*(response(:, i-1) - obj.Ei)); % Explicit Euler update
+                if ~isempty(gnmda)
+                    response(:, i) = response(:, i-1) + (1/fs)*(1/obj.Cm)*(Iinj - (1/obj.Rin)*(response(:, i-1) - obj.Er) - ge(:, i-1)*(response(:, i-1)-obj.Ee) - gi(:, i-1)*(response(:, i-1) - obj.Ei) - gnmda(:, i-1)*(response(:, i-1) - obj.Enmda)*(response(:, i-1) > obj.Eth_nmda)); % Explicit Euler update
+                else
+                    response(:, i) = response(:, i-1) + (1/fs)*(1/obj.Cm)*(Iinj - (1/obj.Rin)*(response(:, i-1) - obj.Er) - ge(:, i-1)*(response(:, i-1)-obj.Ee) - gi(:, i-1)*(response(:, i-1) - obj.Ei));
+                end
             end
             spikeIndicies = response > obj.Eth; % Vectorized computation of where Vm crosses the spike threshold, Eth.
             refracSamples = floor(obj.Tr*fs); % Number of samples (refractory samples) before another spike can occur.
@@ -82,6 +95,8 @@ classdef Neuron
                 eSamples = index+refracSamples; % From spike until refractory period is finished, zero all spike indicies.
                 if eSamples < size(response, 2)
                     spikeIndicies(:, index:index+refracSamples) = 0;
+                else
+                    spikeIndicies(:, index:end) = 0;
                 end
                 index = find(spikeIndicies, 1, 'first'); % When refractory period is done, compute where the next spike occurs.
             end
