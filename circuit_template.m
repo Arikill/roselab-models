@@ -1,9 +1,9 @@
-s = Stimulus(1e4, 2200, 'triangular', 20e-3, 2e-3, 80e-3, 3);
-[stim, times, trigs] = s.generateStimulus(1.0, 50, 6);
+s = Stimulus(1e4, 2200, 'triangular', 20e-3, 2e-3, 0, 0);
+[stim, times, trigs] = s.generateStimulus(1.0, 50, 10);
 
 disp("Afferent");
 afferent = {};
-afferent.neuron = Neuron(14e-12, 0.5e9, -65e-3, -30e-3, -100e-3, -55e-3, -20e-3, 0.02);
+afferent.neuron = Neuron(48e-12, 0.5e9, -65e-3, -18e-3, -100e-3, -55e-3, -20e-3, 0.02);
 afferent.excitatorySynapse = Synapse(1e-9, 0.01);
 afferent.excitation = afferent.excitatorySynapse.call(trigs, s.fs, 0, 0, 0.01);
 afferent.inhibitorySynapse = Synapse(0e-9, 0.01);
@@ -12,25 +12,25 @@ afferent.inhibition = afferent.inhibitorySynapse.call(trigs, s.fs, 0, 0, 0.01);
 
 disp("Relay");
 relayNeuron = {};
-relayNeuron.neuron = Neuron(14e-12, 0.5e9, -65e-3, -30e-3, -100e-3, -55e-3, -20e-3, 0.02);
+relayNeuron.neuron = Neuron(48e-12, 0.5e9, -65e-3, -18e-3, -100e-3, -55e-3, -20e-3, 0.02);
 relayNeuron.excitatorySynapse = Synapse(1e-9, 0.01);
-relayNeuron.excitation = relayNeuron.excitatorySynapse.call(afferent.spkTrigs, s.fs, 0, 0, 0.01);
+relayNeuron.excitation = relayNeuron.excitatorySynapse.call(afferent.spkTrigs, s.fs, 0, 0, 0.005);
 relayNeuron.inhibitorySynapse = Synapse(0e-9, 0.01);
-relayNeuron.inhibition = relayNeuron.inhibitorySynapse.call(afferent.spkTrigs, s.fs, 0, 0, 0.01);
+relayNeuron.inhibition = relayNeuron.inhibitorySynapse.call(afferent.spkTrigs, s.fs, 0, 0, 0.005);
 [relayNeuron.response, relayNeuron.spkTrigs] = relayNeuron.neuron.call(0e-9, relayNeuron.excitation, relayNeuron.inhibition, s.fs);
 
 disp("LIN");
 lin = {};
-lin.neuron = Neuron(14e-12, 0.5e9, -65e-3, -30e-3, -100e-3, -57e-3, -20e-3, 0.03);
-lin.excitatorySynapse = Synapse(1e-9, 0.03);
-lin.excitation = lin.excitatorySynapse.call(trigs, s.fs, 1/30, 0.03, 0.035);
-lin.inhibitorySynapse = Synapse(0.8e-9, 0.01);
-lin.inhibition = lin.inhibitorySynapse.call(relayNeuron.spkTrigs, s.fs, 1/30, 0.08, 0.01);
+lin.neuron = Neuron(48e-12, 0.5e9, -65e-3, -18e-3, -100e-3, -55e-3, -20e-3, 0.03);
+lin.excitatorySynapse = Synapse(1e-9, 0.025);
+lin.excitation = lin.excitatorySynapse.call(afferent.spkTrigs, s.fs, 1/30, -0.06, 0.01);
+lin.inhibitorySynapse = Synapse(0.9e-9, 0.01);
+lin.inhibition = lin.inhibitorySynapse.call(relayNeuron.spkTrigs, s.fs, 1/30, -0.2, 0.005);
 [lin.response, lin.spkTrigs] = lin.neuron.call(0e-9, lin.excitation, lin.inhibition, s.fs);
 
 disp("ICN");
 icn = {};
-icn.neuron = Neuron(14e-12, 0.5e9, -65e-3, -30e-3, -100e-3, -57e-3, -20e-3, 0.03);
+icn.neuron = Neuron(48e-12, 0.5e9, -65e-3, -30e-3, -100e-3, -57e-3, -20e-3, 0.03);
 icn.excitatorySynapse = Synapse(0.6e-9, 0.02);
 icn.excitation = icn.excitatorySynapse.call(trigs, s.fs, 1/30, 0.1, 0.055);
 icn.inhibitorySynapse = Synapse(1e-9, 0.015);
@@ -39,7 +39,7 @@ icn.inhibition = icn.inhibitorySynapse.call(lin.spkTrigs, s.fs, 1/30, -0.05, 0.0
 
 disp("ICN: 2nd Order");
 icn2 = {};
-icn2.neuron = Neuron(14e-12, 0.5e9, -65e-3, -30e-3, -100e-3, -57e-3, -20e-3, 0.03);
+icn2.neuron = Neuron(48e-12, 0.5e9, -65e-3, -30e-3, -100e-3, -57e-3, -20e-3, 0.03);
 icn2.excitatorySynapse = Synapse(1e-9, 0.01);
 icn2.excitation = icn2.excitatorySynapse.call(icn.spkTrigs, s.fs, 1/30, 0.1, 0.0);
 icn2.inhibitorySynapse = Synapse(0e-9, 0.015);

@@ -23,7 +23,6 @@ classdef Stimulus
             obj.pulseEnvelope = envelope;
             obj.pulseOnTime = pulseOnTime;
             obj.riseTime = riseTime;
-            disp(nargin);
             if nargin < 6
                 obj.gapSamples = 0;
                 obj.gapPulse = 0;
@@ -45,6 +44,10 @@ classdef Stimulus
                 onPulse = cat(2, rise_pulse, fall_pulse);
                 offPulse = zeros(size(onPulse, 1), floor(offTime*obj.fs));
                 modulator = cat(2, onPulse, offPulse);
+            elseif strcmp(obj.pulseEnvelope, 'rectangular')
+                modulator = zeros(1, size(times, 1));
+                on_samples = floor(onTime*obj.fs);
+                modulator(:, 1:on_samples) = 1;
             end
             if size(carrier, 2) > size(modulator, 2)
                 modulator = cat(2, modulator, zeros(size(modulator, 1), size(carrier, 2)-size(modulator, 2)));
