@@ -13,24 +13,24 @@ parameters.relay.delay = 0.005;
 
 %% LIN neural parameters
 parameters.lin = template_parameters;
-parameters.lin.Eth = -58.5e-3;
-parameters.lin.syne.tau = 0.0235;
-parameters.lin.syne.integration_tau = 0.0035;
-parameters.lin.syni.integration_tau = 0;
-parameters.lin.syni.delay = 0.027;
-parameters.lin.syni.gain = 0.9e-9;
+parameters.lin.Eth = -59.6e-3;
+parameters.lin.syne.delay = 0.01;
+parameters.lin.syne.tau = 0.03505;
+parameters.lin.syne.integration_tau = -0.0535;
+parameters.lin.syni.tau = 0.02;
+parameters.lin.syni.delay = 0.0247;
+parameters.lin.syni.integration_tau = -0.109;
 
 %% ICN neuronal paramters
 parameters.icn = template_parameters;
-parameters.icn.syne.tau = 0.01;
-parameters.icn.syne.delay = 0.05;
-parameters.icn.syne.integration_tau = 3;
+parameters.icn.syne.tau = 0.02;
+parameters.icn.syne.delay = 0.028;
+parameters.icn.syne.integration_tau = 10;
+parameters.icn.syne.gain = 0.55e-9;
 parameters.icn.syne.integration_type = "exponential";
 parameters.icn.Eth = -50e-3;
 parameters.icn.syni.tau = 0.01;
-parameters.icn.syni.integration_tau = 0;
 parameters.icn.syni.gain = 1.5e-9;
-
 
 %% Build neural network:
 afferent = Neuron2(s.fs, parameters.afferent);
