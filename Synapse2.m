@@ -5,6 +5,7 @@ classdef Synapse2
        delay % delay in response after pre-synaptic neuron spikes (sec).
        Erev % Synaptic reversal potential (mV).
        integration_tau % time constant factor that determines the strength of depression or summation over time (sec).
+       integration_type % type of depression or summation scaling (eg., quadratic or linear).
        max_integration_interval % the interval required for the integrative effects, like depression or summation, to start (sec or 1/Hz).
        g % synaptic response across time after receiving an input (S).
    end
@@ -18,6 +19,7 @@ classdef Synapse2
            obj.delay = parameters.delay;
            obj.Erev = parameters.Erev;
            obj.integration_tau = parameters.integration_tau;
+           obj.integration_type = parameters.integration_type;
            obj.max_integration_interval = parameters.max_integration_interval;
        end
        
@@ -39,6 +41,7 @@ classdef Synapse2
             
             nspikes = size(input_spike_times, 2);
             ntimesteps = size(times, 2);
+            scaler = obj.getScaler(input_spike_times);
             obj.g = times*0.0;
             
             % modulation_factor attenuates or amplifies the response to the
@@ -52,12 +55,25 @@ classdef Synapse2
             for t = 1: 1: nspikes
                 exponent = (times > input_spike_times(t)).*(times - input_spike_times(t))./obj.tau;
                 response_to_each_spike(t, :) =  modulation_factor.*exponent.*exp(-1.*exponent + 1);
-                modulation_factor = modulation_factor + obj.integration_tau*(inter_spike_interval < obj.max_integration_interval)*modulation_factor;
+                modulation_factor = modulation_factor + scaler(t)*(inter_spike_interval < obj.max_integration_interval)*modulation_factor;
             end
             % integrate all the inputs together.
             obj.g = max(response_to_each_spike, [], 1);
             % add temporal delay to the response.
             obj = obj.delayResponse(fs);
+       end
+
+       function scaler = getScaler(obj, input_spike_times)
+           if strcmp(obj.integration_type, "quadratic")
+               scaler = input_spike_times.^2;
+               scaler = (scaler - min(scaler))./(max(scaler) - min(scaler));
+               scaler = scaler + obj.integration_tau;
+           elseif strcmp(obj.integration_type, "linear")
+               scaler = zeros(size(input_spike_times));
+               scaler = scaler + obj.integration_tau;
+           elseif strcmp(obj.integration_type, "exponential")
+               scaler = 1-exp(-obj.integration_tau.*input_spike_times);
+           end
        end
 
        function obj = delayResponse(obj, fs)

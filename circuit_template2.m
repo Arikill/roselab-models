@@ -1,6 +1,6 @@
 %% Build Stimulus
 s = Stimulus(1e4, 2200, 'triangular', 20e-3, 2e-3, 0, 0);
-[stim, times, trigs] = s.generateStimulus(1.0, 60, 8);
+[stim, times, trigs] = s.generateStimulus(1.0, 60, 1);
 
 %% Template Neuronal parameters
 template_parameters = load('template_parameters.mat').template_parameters;
@@ -11,7 +11,7 @@ parameters.afferent = template_parameters;
 %% Short-pass duration neuronal parameters
 parameters.short_pass = template_parameters;
 parameters.short_pass.delay = 0;
-parameters.short_pass.Eth = -56.6e-3;
+parameters.short_pass.Eth = -56.4e-3;
 parameters.short_pass.syne.tau = 0.02;
 parameters.short_pass.syne.delay = 0.02;
 parameters.short_pass.syne.integration_tau = -0.045;
