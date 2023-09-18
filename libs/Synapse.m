@@ -23,11 +23,19 @@ classdef Synapse
             % parameters.plasticity.tau: time constant factor that determines the strength of depression or summation over time (sec).
             % parameters.plasticity.type: type of depression or summation scaling (eg., quadratic or simple).
             % parameters.plasticity.interval: the interval at which plasticity, like depression or summation, start (sec or 1/Hz).
+
+            % Validate input structure
+            requiredFields = {'tau', 'gain', 'delay', 'Erev', 'plasticity'};
+            for idx = 1:length(requiredFields)
+                if ~isfield(parameters, requiredFields{idx})
+                    error('Synapse:MissingParameter', ['Missing parameter: ', requiredFields{idx}]);
+                end
+            end
             obj.tau = parameters.tau;
             obj.gain = parameters.gain;
             obj.delay = parameters.delay;
             obj.Erev = parameters.Erev;
-            obj.plasticity = parameters.plasticity; % A struct that contains (tau, type & interval).
+            obj.plasticity = parameters.plasticity;
         end
 
         function output = propagate(obj, fs, sim_times, spikes)
@@ -68,8 +76,9 @@ classdef Synapse
 
                 % Construct an alpha function for each spike. We are using
                 % matlabs matrix operations by feeding spike_times array.
-                exponent = ((sim_times' > spike_times).*(sim_times' - spike_times)./syn_tau)';
-                spike_reponses = exponent.*exp(1-exponent);
+                valid_indices = sim_times' > spike_times;
+                exponent = (valid_indices.*(sim_times' - spike_times)./syn_tau)';
+                spike_responses = exponent.*exp(1-exponent);
 
                 % To compute the output, just matrix multiply scaler with
                 % spike_responses that contains the responses for each
@@ -80,7 +89,7 @@ classdef Synapse
                 % combining each spike response doesn't need to be done
                 % manually.
 %                 output(z, :) = syn_gain.*max(scaler'.*spike_reponses, [], 1);
-                output(z, :) = syn_gain.*scaler*spike_reponses;
+                output(z, :) = syn_gain.*scaler*spike_responses;
             end
         end
     end
