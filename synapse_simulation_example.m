@@ -9,8 +9,8 @@ for i = 1: 1: nbatches
     spikes(i, :) = spikes(i, randperm(ntimesteps));
 end
 
-%% Load parameters form template:
-parameters = load('synapse_template_parameters.mat').parameters;
+%% Load default parameters:
+parameters = load('./settings/synapse_default_parameters.mat').parameters;
 
 %% Initialize parallel processing:
 if isempty(gcp('nocreate')) % Check if parallel pool exists

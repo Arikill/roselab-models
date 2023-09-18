@@ -12,8 +12,8 @@ for i = 1: 1: nbatches
 end
 
 %% Load parameters from template:
-parameters = load("neuron_template_parameters.mat").parameters;
-parameters.Eth = -40e-3;
+parameters = load("./settings/neuron_default_parameters.mat").parameters;
+parameters.Eth = -35e-3;
 
 %% Initialize parallel processing:
 if isempty(gcp('nocreate')) % Check if parallel pool exists

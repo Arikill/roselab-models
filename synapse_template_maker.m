@@ -26,4 +26,4 @@ parameters.plasticity.type="simple";
 parameters.plasticity.sweep = 1;
 
 %% Save parameters:
-save("synapse_template_parameters.mat", "parameters");
+save("./settings/synapse_template_parameters.mat", "parameters");

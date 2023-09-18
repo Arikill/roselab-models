@@ -78,7 +78,6 @@ classdef Neuron
                 refract(spike_idx) = Sr; % Set refractory counter for batches that spiked
                 refract(refract > 0) = refract(refract > 0) - 1; % Decrement refractory counter for non-zero batches
             end
-
         end
     end
 end

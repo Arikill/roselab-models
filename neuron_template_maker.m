@@ -20,12 +20,12 @@ parameters.Emax = 0e-3;
 parameters.Tr = 2e-3;
 
 % Excitatory synapse parameters. Load from template.
-parameters.syne = load("synapse_template_parameters.mat").parameters;
+parameters.syne = load("./settings/synapse_default_parameters.mat").parameters;
 
 % Inhibitory synapse parameters. Load from template.
-parameters.syni = load("synapse_template_parameters.mat").parameters;
+parameters.syni = load("./settings/synapse_default_parameters.mat").parameters;
 % parameters.syni.gain = -1*parameters.syni.gain;
 parameters.syni.Erev = -100e-3;
 %% Save parameters
-save("neuron_template_parameters.mat", "parameters");
+save("./settings/neuron_default_parameters.mat", "parameters");
 
