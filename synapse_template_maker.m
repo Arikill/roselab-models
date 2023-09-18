@@ -1,3 +1,4 @@
+%% Build parameters:
 parameters = {};
 
  % time constant of the synaptic response (sec).
@@ -23,3 +24,6 @@ parameters.plasticity.type="simple";
 % plasticity.sweep: % if sweep is positivie (+1) the synapse exhibits
 % summation or facilitation; negative (-1) sweep results in depression.
 parameters.plasticity.sweep = 1;
+
+%% Save parameters:
+save("synapse_template_parameters.mat", "parameters");

@@ -21,7 +21,7 @@ end
 syn_e = Synapse(parameters);
 
 %% Propagate inputs through the synapse:
-output=syn.propagate(spikes, sim_times, fs);
+output=syn_e.propagate(fs, sim_times, spikes);
 
 %% Plot output:
 figure();
