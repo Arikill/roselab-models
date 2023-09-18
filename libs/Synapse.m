@@ -1,6 +1,4 @@
 classdef Synapse
-    %UNTITLED Summary of this class goes here
-    %   Detailed explanation goes here
 
     properties
         tau % time constant of the synaptic response (sec).
@@ -15,6 +13,16 @@ classdef Synapse
 
     methods
         function obj = Synapse(parameters)
+            % parameters must contain the following:
+            % parameters.tau: time constant of the synaptic response (sec).
+            % parameters.gain: amplitude of the synaptic response conductance (S).
+            % parameters.delay: delay in response after input event (sec).
+            % parameters.Erev: Synaptic reversal potential (mV).
+            % parameters.plasticity: A nonlinear temporal process at the
+            % synapse that integrates temporal inputs.
+            % parameters.plasticity.tau: time constant factor that determines the strength of depression or summation over time (sec).
+            % parameters.plasticity.type: type of depression or summation scaling (eg., quadratic or simple).
+            % parameters.plasticity.interval: the interval at which plasticity, like depression or summation, start (sec or 1/Hz).
             obj.tau = parameters.tau;
             obj.gain = parameters.gain;
             obj.delay = parameters.delay;
@@ -22,7 +30,7 @@ classdef Synapse
             obj.plasticity = parameters.plasticity; % A struct that contains (tau, type & interval).
         end
 
-        function output = propagate(obj, fs, sim_times, spikes)
+        function output = propagate(obj, spikes, sim_times, fs)
             % Input is a batch vector consisting of 0s & 1s.
             [nbatches, ntimesteps] = size(spikes);
 
