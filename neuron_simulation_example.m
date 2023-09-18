@@ -13,6 +13,7 @@ end
 
 %% Load parameters from template:
 parameters = load("neuron_template_parameters.mat").parameters;
+parameters.Eth = -40e-3;
 
 %% Initialize parallel processing:
 if isempty(gcp('nocreate')) % Check if parallel pool exists

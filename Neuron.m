@@ -40,12 +40,12 @@ classdef Neuron
             ge = obj.syne.propagate(fs, sim_times, espikes);
             gi = obj.syni.propagate(fs, sim_times, ispikes);
             Vm = ones(nbatches, ntimesteps).*obj.Er;
+            Sr = floor(fs*obj.Tr);
             for t = 2: 1: ntimesteps
                 Vm(:, t) = Vm(:, t-1) + (1/fs).*(1/obj.Cm).*...
                     (i_inj - (1/obj.Rin).*(Vm(:, t-1) - obj.Er) ...
                     - ge(:, t-1).*(Vm(:, t-1) - obj.syne.Erev) - gi(:, t-1).*(Vm(:, t-1) - obj.syni.Erev));
             end
-            spikes = (Vm > obj.Eth);
         end
     end
 end
