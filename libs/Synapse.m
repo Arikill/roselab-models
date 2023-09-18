@@ -30,7 +30,7 @@ classdef Synapse
             obj.plasticity = parameters.plasticity; % A struct that contains (tau, type & interval).
         end
 
-        function output = propagate(obj, spikes, sim_times, fs)
+        function output = propagate(obj, fs, sim_times, spikes)
             % Input is a batch vector consisting of 0s & 1s.
             [nbatches, ntimesteps] = size(spikes);
 
