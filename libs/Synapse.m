@@ -57,7 +57,7 @@ classdef Synapse
 
             % Parallel for loop across all batches of input (spikes or
             % triggers)
-            parfor z = 1: nbatches
+            for z = 1: nbatches
                 % Find the times where the input is 1 and not 0, find
                 % function gives us indices, these are then coverted into
                 % time points using sampling rate.
@@ -88,8 +88,8 @@ classdef Synapse
                 % together. Matrix multiplication is a cross product, so
                 % combining each spike response doesn't need to be done
                 % manually.
-%                 output(z, :) = syn_gain.*max(scaler'.*spike_reponses, [], 1);
-                output(z, :) = syn_gain.*scaler*spike_responses;
+                output(z, :) = syn_gain.*max(scaler'.*spike_responses, [], 1);
+%                 output(z, :) = syn_gain.*scaler*spike_responses;
             end
         end
     end

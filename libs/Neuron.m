@@ -67,7 +67,7 @@ classdef Neuron
             % Update Vm at every timestep.
             % Using Explicit Euler, therefore sampling rate (fs) matter. Higher
             % the sampling rate, the more accurate the result.
-            for t = 2:1:ntimesteps
+            for t = 2:1:ntimesteps % Could the ntimesteps be reduced with prior knowledge of conductance?
                 Vm(:, t) = Vm(:, t-1) + (1/fs).*(1/obj.Cm).*...
                     (i_inj - (1/obj.Rin).*(Vm(:, t-1) - obj.Er) ...
                     - ge(:, t-1).*(Vm(:, t-1) - obj.syne.Erev) - gi(:, t-1).*(Vm(:, t-1) - obj.syni.Erev));

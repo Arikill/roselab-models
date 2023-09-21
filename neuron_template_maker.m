@@ -26,6 +26,7 @@ parameters.syne = load("./settings/synapse_default_parameters.mat").parameters;
 parameters.syni = load("./settings/synapse_default_parameters.mat").parameters;
 % parameters.syni.gain = -1*parameters.syni.gain;
 parameters.syni.Erev = -100e-3;
+
 %% Save parameters
 save("./settings/neuron_default_parameters.mat", "parameters");
 
