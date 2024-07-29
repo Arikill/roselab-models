@@ -25,6 +25,7 @@ parameters.relay.delay = 0.005;
 %% LIN neural parameters
 parameters.lin = template_parameters;
 parameters.lin.Eth = -59.8e-3;
+parameters.lin.Tr = 0.02;
 parameters.lin.syne.integration_tau = -0.1;
 parameters.lin.syni.integration_tau = -0.1;
 parameters.lin.syni.delay = 0.02;
@@ -32,6 +33,7 @@ parameters.lin.syni.gain = 0.7e-9;
 
 %% ICN neuronal paramters
 parameters.icn = template_parameters;
+parameters.icn.Tr = 0.02;
 parameters.icn.syne.delay = 0.05;
 parameters.icn.syne.integration_tau = -0.1;
 parameters.icn.Eth = -56.2e-3;
