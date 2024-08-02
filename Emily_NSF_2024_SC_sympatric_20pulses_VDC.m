@@ -66,8 +66,8 @@ end
 
 %% Propagating inputs throught the neural network & plotting
 nplots = 9;
-figure_handle = figure(1);
-figure_handle.Name = 'Rose-Lemmon NSF 2024 Ancestral';
+figure_handle = figure();
+figure_handle.Name = 'Rose-Lemmon NSF 2024 SC 20 pulses VDC';
 tiledlayout(nplots, nconditions, "TileIndexing", "columnmajor");
 axes = gobjects(nplots, nconditions);
 
@@ -121,8 +121,9 @@ for i = 1:nconditions
     
     axes(9, i) = nexttile;
     plot(times{i, 1}, stimuli{i, 1}, 'k');
+    ylabel(axes(9, i), 'Stimulus');
     xlabel(axes(9, i), 'times (sec)');
-    title(axes(9, i), 'Stimulus');
+    title(axes(9, i), strcat(num2str(pulse_rates(i)), 'pps'));
 
     linkaxes(axes(:, i), 'x');
     

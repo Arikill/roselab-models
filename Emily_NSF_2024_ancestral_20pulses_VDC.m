@@ -64,7 +64,7 @@ end
 %% Propagating inputs throught the neural network & plotting
 nplots = 9;
 figure_handle = figure();
-figure_handle.Name = 'Rose-Lemmon NSF 2024 Ancestral 10 pulses VDC';
+figure_handle.Name = 'Rose-Lemmon NSF 2024 Ancestral 20 pulses VDC';
 tiledlayout(nplots, nconditions, "TileIndexing", "columnmajor");
 axes = gobjects(nplots, nconditions);
 

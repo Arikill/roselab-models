@@ -52,7 +52,7 @@ icn = Neuron2(s.fs, parameters.icn);
 %% Building stimulus:
 pulse_rates = [10, 30, 50]; %pulses per second.
 pulses = [10, 10, 10];
-stimulus_duration = 1.25;
+stimulus_duration = 2.2;
 nconditions = numel(pulse_rates);
 stimuli = cell(nconditions, 1);
 times = cell(nconditions, 1);
